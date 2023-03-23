@@ -91,6 +91,9 @@ const Goods: NextPageWithLayout = () => {
         rows,
         prepareRow,
     } = useTable({
+        // TODO: Fix this
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
         columns,
         data: products || [],
     });
