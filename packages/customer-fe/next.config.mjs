@@ -27,6 +27,7 @@ const config = {
         options: { subsets: ["latin"] },
       },
     ],
+    appDir: true,
   },
 };
 export default config;

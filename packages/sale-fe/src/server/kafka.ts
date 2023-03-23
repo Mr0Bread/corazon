@@ -10,13 +10,3 @@ export const createNewProductsProducer = () => {
 
   return kafka.producer();
 }
-
-export const createNewProductsConsumer = () => {
-  const kafka = new Kafka({
-    url: env.UPSTASH_KAFKA_REST_URL,
-    username: env.KAFKA_CONSUME_NEW_PRODUCTS_USERNAME,
-    password: env.KAFKA_CONSUME_NEW_PRODUCTS_PASSWORD,
-  });
-
-  return kafka.consumer();
-}
