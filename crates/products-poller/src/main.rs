@@ -29,13 +29,16 @@ struct MessageValue {
 
 async fn consume_messages() -> Result<Vec<Message>, Error> {
     println!("Consuming messages...");
-
+    let token = match std::env::var("CONSUME_API_TOKEN") {
+        Ok(val) => val,
+        Err(_) => return Err(Error::RequestFailed),
+    };
     let client = reqwest::Client::new();
     let response = client
         .get(
             "https://settled-pipefish-14875-eu1-rest-kafka.upstash.io/consume/group_1/instance_1/new-products"
         )
-        .header("Authorization", "Basic YzJWMGRHeGxaQzF3YVhCbFptbHphQzB4TkRnM05TU0ttUWJvcDFuZWMzVkpVLWJBb2N4WVMyRkZtLXhBdXlBOmQ3M2IyNjI1ZmM5NjRkM2ZiNjFkOTkxMDgxZDI3MjY0")
+        .header("Authorization", "Basic ".to_owned() + &token)
         .header("Kafka-Auto-Offset-Reset", "earliest")
         .send()
         .await;
