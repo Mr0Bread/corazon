@@ -2,7 +2,6 @@ use reqwest;
 use tokio;
 use serde;
 use serde_json;
-use url;
 use dotenv::dotenv;
 use std;
 
