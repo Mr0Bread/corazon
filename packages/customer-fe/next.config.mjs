@@ -21,12 +21,6 @@ const config = {
     defaultLocale: "en",
   },
   experimental: {
-    fontLoaders: [
-      {
-        loader: "@next/font/google",
-        options: { subsets: ["latin"] },
-      },
-    ],
     appDir: true,
   },
 };

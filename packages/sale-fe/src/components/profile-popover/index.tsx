@@ -1,60 +1,42 @@
+"use client";
+
 import {
-    Button,
-    Popover,
-    PopoverArrow,
-    PopoverBody,
-    PopoverCloseButton,
-    PopoverContent,
-    PopoverHeader,
-    PopoverTrigger
-} from "@chakra-ui/react";
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover"
+import { Button } from "@/components/ui/button"
 import { BsPersonCircle } from "react-icons/bs";
-import { useUser, useClerk } from '@clerk/nextjs';
 import Link from "next/link";
+import { useClerk } from "@clerk/nextjs";
 
 export const ProfilePopover: React.FC = () => {
-    const { isLoaded, isSignedIn, user } = useUser();
     const { signOut } = useClerk();
 
-    if (!isLoaded || !isSignedIn) {
-        return null
-    }
-
     return (
-        <Popover>
-            <PopoverTrigger>
-                <Button
-                    variant="ghost"
-                >
-                    <BsPersonCircle size={28} />
-                </Button>
-            </PopoverTrigger>
-            <PopoverContent>
-                <PopoverArrow />
-                <PopoverCloseButton />
-                <PopoverHeader>
-                    { user.fullName }
-                </PopoverHeader>
-                <PopoverBody
-                    display="flex"
-                    flexDirection="row"
-                    justifyContent="space-between"
-                >
-                    <Link href="/my-account/general">
-                        <Button>
-                            Go to profile
-                        </Button>
-                    </Link>
-                    <Button
-                        colorScheme="red"
-                        onClick={() => signOut()}
-                    >
-                        Sign Out
-                    </Button>
-                </PopoverBody>
-            </PopoverContent>
-        </Popover>
-    )
+      <Popover>
+        <PopoverTrigger asChild>
+            <Button
+              variant="ghost"
+              className="text-gray-200"
+            >
+              <BsPersonCircle size={28} />
+            </Button>
+        </PopoverTrigger>
+        <PopoverContent asChild>
+          <div className="bg-slate-900 border-0 flex flex-col gap-4">
+            <Link href="/my-account/general">
+              <Button variant="outline" className="w-full">
+                Go to profile
+              </Button>
+            </Link>
+            <Button variant="destructive" onClick={() => signOut()}>
+              Sign out
+            </Button>
+          </div>
+        </PopoverContent>
+      </Popover>
+    );
 }
 
 export default ProfilePopover

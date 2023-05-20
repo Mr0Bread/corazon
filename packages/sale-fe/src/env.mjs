@@ -11,6 +11,9 @@ const server = z.object({
   UPSTASH_KAFKA_REST_URL: z.string().min(1),
   UPSTASH_KAFKA_REST_USERNAME: z.string().min(1),
   UPSTASH_KAFKA_REST_PASSWORD: z.string().min(1),
+  DATABASE_HOST: z.string().min(1),
+  DATABASE_USERNAME: z.string().min(1),
+  DATABASE_PASSWORD: z.string().min(1)
 });
 
 /**
@@ -19,6 +22,10 @@ const server = z.object({
  */
 const client = z.object({
   NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: z.string().min(1),
+  NEXT_PUBLIC_CLERK_SIGN_IN_URL: z.string().min(1),
+  NEXT_PUBLIC_CLERK_SIGN_UP_URL: z.string().min(1),
+  NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL: z.string().min(1),
+  NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL: z.string().min(1)
 });
 
 /**
@@ -35,6 +42,13 @@ const processEnv = {
   UPSTASH_KAFKA_REST_URL: process.env.UPSTASH_KAFKA_REST_URL,
   UPSTASH_KAFKA_REST_USERNAME: process.env.UPSTASH_KAFKA_REST_USERNAME,
   UPSTASH_KAFKA_REST_PASSWORD: process.env.UPSTASH_KAFKA_REST_PASSWORD,
+  NEXT_PUBLIC_CLERK_SIGN_IN_URL: process.env.NEXT_PUBLIC_CLERK_SIGN_IN_URL,
+  NEXT_PUBLIC_CLERK_SIGN_UP_URL: process.env.NEXT_PUBLIC_CLERK_SIGN_UP_URL,
+  NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL: process.env.NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL,
+  NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL: process.env.NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL,
+  DATABASE_HOST: process.env.DATABASE_HOST,
+  DATABASE_USERNAME: process.env.DATABASE_USERNAME,
+  DATABASE_PASSWORD: process.env.DATABASE_PASSWORD
 };
 
 // Don't touch the part below
