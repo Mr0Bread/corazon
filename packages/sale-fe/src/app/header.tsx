@@ -7,7 +7,7 @@ export default async function Header() {
 
   return (
     <div
-      className="sticky flex justify-center w-full"
+      className="sticky flex justify-center w-full px-4"
     >
       <div
         className="flex py-4 justify-between w-full max-w-7xl"

@@ -2,10 +2,11 @@ import Link from "next/link";
 import { Button } from "~/components/ui/button";
 import { db } from "~/server/db";
 import { products } from "~/server/schema";
+import GoodsTable from "./table";
 
 export default async function Page() {
     const goods = await db.select().from(products).limit(10);
-    
+
     return (
         <div>
             <div
@@ -22,16 +23,12 @@ export default async function Page() {
                     </Button>
                 </Link>
             </div>
-            <div>
-                {
-                    goods.map((good) => (
-                        <div
-                            key={good.id}
-                        >
-                            {good.name}
-                        </div>
-                    ))
-                }
+            <div
+                className="mt-4 text-gray-200"
+            >
+                <GoodsTable
+                    goods={goods}
+                />
             </div>
         </div>
     );

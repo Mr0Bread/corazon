@@ -1,6 +1,14 @@
 // app/layout.tsx
-import './globals.css'
+import '../styles/globals.css'
 import { ClerkProvider } from '@clerk/nextjs'
+import { Inter as FontSans } from 'next/font/google'
+import Header from './header'
+
+const fontSans = FontSans({
+  subsets: ["latin"],
+  variable: "--font-sans",
+  display: "swap",
+})
 
 export default function RootLayout({
   children,
@@ -9,8 +17,11 @@ export default function RootLayout({
 }) {
   return (
     <ClerkProvider>
-      <html lang="en">
-        <body className="min-h-screen bg-gray-100 dark:bg-slate-900 text-gray-900 antialiased">{children}</body>
+      <html lang="en" className={`${fontSans.className} dark`}>
+        <body className="min-h-screen bg-background text-gray-900 antialiased flex flex-col items-center">
+          <Header />
+          {children}
+        </body>
       </html>
     </ClerkProvider>
   )

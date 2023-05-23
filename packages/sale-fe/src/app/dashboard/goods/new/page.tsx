@@ -22,12 +22,12 @@ export default function Page() {
                     href="/dashboard/goods/import-csv"
                 >
                     <Card
-                        className="hover:bg-slate-800 transition-colors"
+                        className="hover:bg-slate-800 transition-colors border-slate-800"
                     >
                         <CardHeader>
                             <CardTitle>
                                 <div
-                                    className="flex items-center gap-4"
+                                    className="flex items-center gap-4 text-foreground/90"
                                 >
                                     Import from CSV
                                 </div>
@@ -44,12 +44,12 @@ export default function Page() {
                     href="/dashboard/goods/manually"
                 >
                     <Card
-                        className="hover:bg-slate-800 transition-colors"
+                        className="hover:bg-slate-800 transition-colors border-slate-800"
                     >
                         <CardHeader>
                             <CardTitle>
                                 <div
-                                    className="flex items-center gap-4"
+                                    className="flex items-center gap-4 text-foreground/90"
                                 >
                                     Manually
                                 </div>

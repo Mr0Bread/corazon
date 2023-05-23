@@ -21,8 +21,15 @@ const config = {
     defaultLocale: "en",
   },
   experimental: {
-    appDir: true,
-    serverActions: true
+    appDir: true
+  },
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "uploadthing.com",
+      }
+    ]
   }
 };
 export default config;

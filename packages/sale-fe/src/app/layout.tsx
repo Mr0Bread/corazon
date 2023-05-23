@@ -1,9 +1,11 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 // app/layout.tsx
+import "@uploadthing/react/styles.css";
 import '../styles/globals.css'
 import { ClerkProvider } from '@clerk/nextjs'
 import { Inter as FontSans } from 'next/font/google'
 import Header from './header'
+import { TrpcProvider } from '~/utils/trpc-provider'
 
 const fontSans = FontSans({
   subsets: ["latin"],
@@ -18,11 +20,17 @@ export default async function RootLayout({
 }) {
   return (
     <html lang="en" className={`${fontSans.className} dark`}>
-      <body className="min-h-screen bg-background text-gray-900 antialiased flex flex-col items-center">
-        <div className="max-w-7xl w-full">
-          {children}
-        </div>
-      </body>
+      <ClerkProvider>
+        <TrpcProvider>
+          <body className="min-h-screen bg-background text-gray-900 antialiased flex flex-col items-center">
+            <div className="max-w-7xl w-full">
+              {/* @ts-expect-error */}
+              <Header />
+              {children}
+            </div>
+          </body>
+        </TrpcProvider>
+      </ClerkProvider>
     </html>
   )
 }

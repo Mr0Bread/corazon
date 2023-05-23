@@ -23,5 +23,13 @@ const config = {
   experimental: {
     appDir: true,
   },
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "uploadthing.com",
+      }
+    ]
+  }
 };
 export default config;

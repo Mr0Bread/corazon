@@ -40,7 +40,7 @@ export default function DashboardLayout({
   return (
     <>
       <div
-        className="grid grid-cols-1 md:grid-cols-[1fr_4fr] gap-8"
+        className="grid grid-cols-1 md:grid-cols-[1fr_4fr] gap-8 px-4"
       >
         <div className="flex flex-col gap-4">
           {

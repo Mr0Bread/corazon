@@ -28,6 +28,9 @@
       ],
       "@/*": [
         "./src/*"
+      ],
+      "@corazon/sale-fe/*": [
+        "../sale-fe/*"
       ]
     },
     "plugins": [
@@ -44,8 +47,9 @@
     "**/*.cjs",
     "**/*.mjs",
     "../../packages/customer-fe/.next/types/**/*.ts",
-    ".next/types/**/*.ts"
-  ],
+    ".next/types/**/*.ts",
+    "tw.d.ts"
+, "../ui/collapsible.tsx"  ],
   "exclude": [
     "node_modules",
     "jest.config.ts",

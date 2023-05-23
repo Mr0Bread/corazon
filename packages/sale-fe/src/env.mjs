@@ -13,7 +13,9 @@ const server = z.object({
   UPSTASH_KAFKA_REST_PASSWORD: z.string().min(1),
   DATABASE_HOST: z.string().min(1),
   DATABASE_USERNAME: z.string().min(1),
-  DATABASE_PASSWORD: z.string().min(1)
+  DATABASE_PASSWORD: z.string().min(1),
+  UPLOADTHING_SECRET: z.string().min(1),
+  UPLOADTHING_APP_ID: z.string().min(1),
 });
 
 /**
@@ -48,7 +50,9 @@ const processEnv = {
   NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL: process.env.NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL,
   DATABASE_HOST: process.env.DATABASE_HOST,
   DATABASE_USERNAME: process.env.DATABASE_USERNAME,
-  DATABASE_PASSWORD: process.env.DATABASE_PASSWORD
+  DATABASE_PASSWORD: process.env.DATABASE_PASSWORD,
+  UPLOADTHING_SECRET: process.env.UPLOADTHING_SECRET,
+  UPLOADTHING_APP_ID: process.env.UPLOADTHING_APP_ID
 };
 
 // Don't touch the part below
