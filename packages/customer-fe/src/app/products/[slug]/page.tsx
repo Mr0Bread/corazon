@@ -1,5 +1,5 @@
 import { db } from '@corazon/sale-fe/src/server/db'
-import { products as productsTable, categories as categoriesTable, productsToCategories } from '@corazon/sale-fe/src/server/schema'
+import { categories as categoriesTable, productsToCategories } from '@corazon/sale-fe/src/server/schema'
 import { eq } from 'drizzle-orm'
 import { Suspense } from 'react';
 import ProductCard from './product-card';
@@ -59,6 +59,8 @@ export default async function Page({ params }: { params: { slug: string } }) {
                             key={linkedProduct.productId}
                             fallback={<ProductCardFallback />}
                         >
+                            {/* eslint-disable-next-line @typescript-eslint/ban-ts-comment */}
+                            {/* @ts-expect-error */}
                             <ProductCard
                                 id={linkedProduct.productId}
                             />
@@ -69,3 +71,5 @@ export default async function Page({ params }: { params: { slug: string } }) {
         </div>
     );
 }
+
+export const runtime = 'edge'
