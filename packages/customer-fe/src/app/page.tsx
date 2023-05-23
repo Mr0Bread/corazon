@@ -8,5 +8,3 @@ const HomePage: React.FC = () => {
 };
 
 export default HomePage;
-
-export const runtime = 'edge'
