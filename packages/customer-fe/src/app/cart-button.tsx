@@ -2,10 +2,6 @@ import { ShoppingBag } from 'lucide-react'
 import {
     Sheet,
     SheetContent,
-    SheetDescription,
-    SheetFooter,
-    SheetHeader,
-    SheetTitle,
     SheetTrigger,
 } from "@/components/ui/sheet"
 import { Button } from '~/components/ui/button';
