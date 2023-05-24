@@ -17,7 +17,6 @@
 import { type CreateNextContextOptions } from "@trpc/server/adapters/next";
 import { getAuth } from '@clerk/nextjs/server'
 import type { SignedInAuthObject,SignedOutAuthObject } from "@clerk/nextjs/dist/api";
-import { prisma } from "~/server/db";
 
 interface AuthContext {
   auth: SignedInAuthObject | SignedOutAuthObject;
@@ -38,7 +37,6 @@ const createInnerTRPCContext = ({
 }: AuthContext) => {
   return {
     auth,
-    prisma,
   };
 };
 

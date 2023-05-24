@@ -11,7 +11,7 @@ import {
     TableRow,
 } from "@/components/ui/table"
 
-const columns: ColumnDef<ProductsSelectSchema>[] = [
+const columns: ColumnDef<Omit<ProductsSelectSchema, 'images'>>[] = [
     {
         header: "ID",
         accessorKey: "id",
@@ -30,7 +30,7 @@ const columns: ColumnDef<ProductsSelectSchema>[] = [
     }
 ];
 
-const GoodsTable: React.FC<{ goods: ProductsSelectSchema[] }> = ({ goods }) => {
+const GoodsTable: React.FC<{ goods: Omit<ProductsSelectSchema, 'images'>[] }> = ({ goods }) => {
     const table = useReactTable({
         columns,
         data: goods,
