@@ -11,6 +11,11 @@ const server = z.object({
   DATABASE_HOST: z.string().min(1),
   DATABASE_USERNAME: z.string().min(1),
   DATABASE_PASSWORD: z.string().min(1),
+  KV_URL: z.string().min(1),
+  KV_REST_API_URL: z.string().min(1),
+  KV_REST_API_TOKEN: z.string().min(1),
+  KV_REST_API_READ_ONLY_TOKEN: z.string().min(1),
+  STRIPE_SECRET_KEY: z.string().min(1),
 });
 
 /**
@@ -22,7 +27,8 @@ const client = z.object({
   NEXT_PUBLIC_CLERK_SIGN_IN_URL: z.string().min(1),
   NEXT_PUBLIC_CLERK_SIGN_UP_URL: z.string().min(1),
   NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL: z.string().min(1),
-  NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL: z.string().min(1)
+  NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL: z.string().min(1),
+  NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: z.string().min(1),
 });
 
 /**
@@ -44,6 +50,12 @@ const processEnv = {
   DATABASE_HOST: process.env.DATABASE_HOST,
   DATABASE_USERNAME: process.env.DATABASE_USERNAME,
   DATABASE_PASSWORD: process.env.DATABASE_PASSWORD,
+  KV_URL: process.env.KV_URL,
+  KV_REST_API_URL: process.env.KV_REST_API_URL,
+  KV_REST_API_TOKEN: process.env.KV_REST_API_TOKEN,
+  KV_REST_API_READ_ONLY_TOKEN: process.env.KV_REST_API_READ_ONLY_TOKEN,
+  STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY,
+  NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY,
 };
 
 // Don't touch the part below

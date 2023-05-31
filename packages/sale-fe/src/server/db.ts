@@ -1,5 +1,16 @@
 import { drizzle } from "drizzle-orm/planetscale-serverless";
 import { connect } from "@planetscale/database";
+import {
+  categories,
+  configs,
+  products,
+  parcelLocations,
+  countries,
+  productsToCategories,
+  orders,
+  orderAddresses,
+  orderItems
+} from './schema'
 
 export const db = drizzle(
   connect({
@@ -8,6 +19,17 @@ export const db = drizzle(
     password: process.env.DATABASE_PASSWORD
   }),
   {
-    logger: true
+    logger: true,
+    schema: {
+      categories,
+      configs,
+      products,
+      parcelLocations,
+      countries,
+      productsToCategories,
+      orders,
+      orderAddresses,
+      orderItems
+    }
   }
 );
