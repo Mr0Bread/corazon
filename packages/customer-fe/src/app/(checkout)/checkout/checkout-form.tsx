@@ -136,7 +136,10 @@ export default function CheckoutForm({
     const [parcelMachine, setParcelMachine] = useState<ParcelMachine | null>(null);
 
     const onSubmit = (data: z.infer<typeof formSchema>) => {
-        mutate();
+        mutate({
+            shippingMethod: data.shippingMethod,
+            shippingAddress: data.shippingAddress as z.infer<typeof addressSchema>,
+        });
     };
 
     const renderParcelSelect = () => {

@@ -12,8 +12,10 @@ import {
     configs as configsTable,
     parcelLocations as parcelLocationsTable,
     orderItems as orderItemsTable,
+    orders as ordersTable,
+    orderAddresses as orderAddressesTable
 } from "@corazon/sale-fe/src/server/schema";
-import { like, eq, and, inArray } from "drizzle-orm";
+import { like, eq, and, inArray, sql, desc } from "drizzle-orm";
 
 export const checkoutRouter = createTRPCRouter({
     getParcelLocations: publicProcedure
@@ -128,8 +130,20 @@ export const checkoutRouter = createTRPCRouter({
         .output(z.object({
             redirectUrl: z.string()
         }))
+        .input(z.object({
+            shippingMethod: z.string(),
+            shippingAddress: z.object({
+                firstName: z.string(),
+                lastName: z.string(),
+                address: z.string(),
+                city: z.string(),
+                postcode: z.string(),
+                country: z.string(),
+                phoneNumber: z.string(),
+            })
+        }))
         .mutation(
-            async () => {
+            async ({ input: { shippingAddress, shippingMethod } }) => {
                 const stripe = new Stripe(
                     env.STRIPE_SECRET_KEY,
                     {
@@ -141,14 +155,16 @@ export const checkoutRouter = createTRPCRouter({
 
                 if (!user) throw new Error('No user');
 
-                const { id, emailAddresses } = user;
+                const { id: userId, emailAddresses } = user;
 
-                const cart = await kv.get(`cart-${id}`);
+                const cart = await kv.get(`cart-${userId}`);
 
-                const { items } = cart as { items: { name: string, quantity: number, price: number, productId: number }[] };
+                const { items, total } = cart as { items: { name: string, quantity: number, price: number, productId: number }[], total: number };
                 const url = process.env.NEXT_PUBLIC_VERCEL_URL || 'http://localhost:3100';
                 const lineItems = [];
 
+                // since it performs API request for each item, it's better to do it in parallel
+                // use Promise.all to process each item in parallel
                 for (const item of items) {
                     const { name, price: unit_amount } = item;
 
@@ -168,12 +184,74 @@ export const checkoutRouter = createTRPCRouter({
                     });
                 }
 
+                const newOrderId = await db.transaction(
+                    async (trx) => {
+                        await trx
+                            .insert(ordersTable)
+                            .values({
+                                userId,
+                                status: 'pending',
+                                productsAmount: total,
+                                shippingPrice: 0,
+                                shippingMethod: shippingMethod
+                            })
+
+                        await trx.execute(
+                            sql`SET @order_id = LAST_INSERT_ID();`
+                        );
+
+                        await trx
+                            .insert(orderItemsTable)
+                            .values(
+                                items.map(
+                                    ({ productId, quantity, price }) => ({
+                                        orderId: sql`@order_id`,
+                                        productId,
+                                        quantity,
+                                        unitPrice: price,
+                                    })
+                                )
+                            )
+
+                        await trx
+                            .insert(orderAddressesTable)
+                            .values({
+                                orderId: sql`@order_id`,
+                                country: shippingAddress.country,
+                                city: shippingAddress.city,
+                                address: shippingAddress.address,
+                                postcode: shippingAddress.postcode,
+                                phone: shippingAddress.phoneNumber
+                            })
+
+                        const [lastOrder] = await trx
+                            .select({
+                                id: ordersTable.id
+                            })
+                            .from(ordersTable)
+                            .where(
+                                eq(ordersTable.userId, userId)
+                            )
+                            .orderBy(
+                                desc(ordersTable.createdAt)
+                            )
+                            .limit(1)
+
+                        const { id } = lastOrder as { id: number };
+
+                        return id;
+                    }
+                )
+
                 const session = await stripe.checkout.sessions.create({
                     mode: 'payment',
                     line_items: lineItems,
-                    success_url: `${url}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
+                    success_url: `${url}/checkout/redirect/success?session_id={CHECKOUT_SESSION_ID}`,
                     cancel_url: `${url}/checkout/cancel`,
                     customer_email: emailAddresses?.[0]?.emailAddress,
+                    metadata: {
+                        orderId: newOrderId
+                    }
                 });
 
                 if (!session.url) throw new Error('No session url');

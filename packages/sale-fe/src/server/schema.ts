@@ -1,6 +1,6 @@
-import { int, json, mysqlTable, serial, uniqueIndex, varchar, primaryKey, index } from 'drizzle-orm/mysql-core';
+import { int, json, mysqlTable, serial, uniqueIndex, varchar, primaryKey, index, timestamp } from 'drizzle-orm/mysql-core';
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
-import { InferModel } from 'drizzle-orm'
+import { InferModel, sql } from 'drizzle-orm'
 import { z } from 'zod';
 
 export const products = mysqlTable(
@@ -128,7 +128,8 @@ export const orders = mysqlTable(
         shippingMethod: varchar('shipping_method', { length: 256 }).notNull(),
         shippingPrice: int('shipping_price').notNull(),
         productsAmount: int('products_amount').notNull(),
-        shippingAddress: int('shipping_address').notNull(),
+        createdAt: timestamp('created_at').defaultNow().notNull(),
+        updatedAt: timestamp('updated_at').defaultNow().onUpdateNow().notNull(),
     },
     (table) => ({
         userIdIdx: index('user_id_idx').on(table.userId)
@@ -146,8 +147,6 @@ export const orderAddresses = mysqlTable(
     {
         id: serial('id').primaryKey(),
         orderId: int('order_id').notNull(),
-        firstName: varchar('first_name', { length: 256 }).notNull(),
-        lastName: varchar('last_name', { length: 256 }).notNull(),
         country: varchar('country', { length: 256 }).notNull(),
         city: varchar('city', { length: 256 }).notNull(),
         postcode: varchar('postcode', { length: 256 }).notNull(),
