@@ -45,7 +45,7 @@ export default function QuickAddButton({
         <Button
             onClick={onClick}
             variant="secondary"
-            className="mt-4 text-foreground/70"
+            className="mt-4 text-foreground/70 hover:text-foreground/90"
         >
             {
                 isLoading ? (

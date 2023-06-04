@@ -6,6 +6,8 @@ import { useEffect } from "react";
 import { CreditCard, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { Button } from "~/components/ui/button";
+import { cn } from "~/lib/utils";
+import { useRouter } from "next/navigation";
 
 export const refetchCartAtom = atom<{ refetch: Function }>({
     refetch: () => null
@@ -32,11 +34,14 @@ export default function CartItems({
         enabled: false
     })
     const [, setRefetch] = useAtom(refetchCartAtom);
+    const router = useRouter();
 
     useEffect(() => {
         setRefetch({
             refetch
         });
+
+        router.prefetch('/checkout');
     }, [])
 
     return (
@@ -78,27 +83,27 @@ export default function CartItems({
                         Total:
                     </div>
                     <div
-                        className="font-bold"
+                        className="font-bold text-orange-400"
                     >
-                        ${new Intl.NumberFormat('en-US').format(total)}
+                        ${new Intl.NumberFormat('en-US').format(total/100)}
                     </div>
                 </div>
                 <div
                     className="flex-grow"
                 >
-                    <Link
-                        href="/checkout"
+                    <Button
+                        className="w-full"
+                        disabled={isFetching || !items.length}
+                        onClick={() => {
+                            router.push('/checkout');
+                        }}
                     >
-                        <Button
-                            className="w-full"
-                        >
-                            <CreditCard
-                                size={24}
-                                className="mr-2"
-                            />
-                            Checkout
-                        </Button>
-                    </Link>
+                        <CreditCard
+                            size={24}
+                            className="mr-2"
+                        />
+                        Checkout
+                    </Button>
                 </div>
             </div>
         </>

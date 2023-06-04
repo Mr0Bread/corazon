@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Button } from "~/components/ui/button";
 import { ExternalLink, X } from "lucide-react";
 import Image from "next/image";
+import OrderTotal from "./order-total";
 
 export default async function OrderSummary() {
     const cart = await kv.get(`cart-${auth().userId}`);
@@ -101,16 +102,7 @@ export default async function OrderSummary() {
                         )
                     }
                 </div>
-                <div
-                    className="flex justify-between items-center mt-4 text-foreground/90 text-2xl font-semibold"
-                >
-                    <div>
-                        Total
-                    </div>
-                    <div>
-                        {`${new Intl.NumberFormat('en-US').format(total)}$`}
-                    </div>
-                </div>
+                <OrderTotal total={total} />
             </div>
         </>
     );

@@ -131,6 +131,7 @@ export const checkoutRouter = createTRPCRouter({
             redirectUrl: z.string()
         }))
         .input(z.object({
+            shipmentPrice: z.number(),
             shippingMethod: z.string(),
             shippingAddress: z.object({
                 firstName: z.string(),
@@ -143,7 +144,7 @@ export const checkoutRouter = createTRPCRouter({
             })
         }))
         .mutation(
-            async ({ input: { shippingAddress, shippingMethod } }) => {
+            async ({ input: { shippingAddress, shippingMethod, shipmentPrice } }) => {
                 const stripe = new Stripe(
                     env.STRIPE_SECRET_KEY,
                     {
@@ -161,28 +162,55 @@ export const checkoutRouter = createTRPCRouter({
 
                 const { items, total } = cart as { items: { name: string, quantity: number, price: number, productId: number }[], total: number };
                 const url = process.env.NEXT_PUBLIC_VERCEL_URL || 'http://localhost:3100';
-                const lineItems = [];
+                const lineItems: { price: string, quantity: number }[] = [];
 
-                // since it performs API request for each item, it's better to do it in parallel
-                // use Promise.all to process each item in parallel
-                for (const item of items) {
-                    const { name, price: unit_amount } = item;
+                const lineItemPromises = items.map(
+                    ({ name, price: unit_amount, quantity }) => {
+                        const fn = async () => {
+                            console.log('creating price for product');
+                            
+                            const { id: productId } = await stripe.products.create({
+                                name
+                            });
+    
+                            const { id: priceId } = await stripe.prices.create({
+                                product: productId,
+                                unit_amount: unit_amount,
+                                currency: 'usd',
+                            });
+    
+                            lineItems.push({
+                                price: priceId,
+                                quantity: quantity,
+                            });
+                        }
 
-                    const { id: productId } = await stripe.products.create({
-                        name
-                    });
+                        return fn();
+                    }
+                );
 
-                    const { id: priceId } = await stripe.prices.create({
-                        product: productId,
-                        unit_amount: unit_amount * 100,
-                        currency: 'usd',
-                    });
+                lineItemPromises
+                    .push(
+                        (async () => {
+                            // create price for shipment
+                            const { id: productId } = await stripe.products.create({
+                                name: 'Shipment'
+                            });
+    
+                            const { id: shipmentPriceId } = await stripe.prices.create({
+                                product: productId,
+                                unit_amount: 1 * shipmentPrice,
+                                currency: 'usd',
+                            });
+    
+                            lineItems.push({
+                                price: shipmentPriceId,
+                                quantity: 1,
+                            });
+                        })()
+                    )
 
-                    lineItems.push({
-                        price: priceId,
-                        quantity: item.quantity,
-                    });
-                }
+                await Promise.all(lineItemPromises)
 
                 const newOrderId = await db.transaction(
                     async (trx) => {
@@ -192,7 +220,7 @@ export const checkoutRouter = createTRPCRouter({
                                 userId,
                                 status: 'pending',
                                 productsAmount: total,
-                                shippingPrice: 0,
+                                shippingPrice: shipmentPrice,
                                 shippingMethod: shippingMethod
                             })
 
@@ -247,7 +275,7 @@ export const checkoutRouter = createTRPCRouter({
                     mode: 'payment',
                     line_items: lineItems,
                     success_url: `${url}/checkout/redirect/success?session_id={CHECKOUT_SESSION_ID}`,
-                    cancel_url: `${url}/checkout/cancel`,
+                    cancel_url: `${url}/checkout/redirect/cancel?session_id={CHECKOUT_SESSION_ID}`,
                     customer_email: emailAddresses?.[0]?.emailAddress,
                     metadata: {
                         orderId: newOrderId

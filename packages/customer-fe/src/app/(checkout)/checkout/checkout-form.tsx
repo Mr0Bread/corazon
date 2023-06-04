@@ -30,9 +30,11 @@ import { Loader2, CreditCard } from "lucide-react";
 import { cn } from "~/lib/utils";
 import { useState } from "react";
 import { useUser } from "@clerk/nextjs";
-import { useRouter } from "next/navigation";
 import type { UserResource } from '@clerk/types';
 import { api } from "~/utils/api";
+import { atom, useAtom } from "jotai";
+
+export const shipmentPriceAtom = atom(0);
 
 const formSchema = z.object({
     country: z.string(),
@@ -131,12 +133,21 @@ export default function CheckoutForm({
         enabled: false
     })
 
+    const [, setShipmentPrice] = useAtom(shipmentPriceAtom);
+
     const [isCountrySelectOpen, setIsCountrySelectOpen] = useState(false);
     const [isParcelSelectOpen, setIsParcelSelectOpen] = useState(false);
     const [parcelMachine, setParcelMachine] = useState<ParcelMachine | null>(null);
 
     const onSubmit = (data: z.infer<typeof formSchema>) => {
+        const selectedShippingMethod = shippingMethodsData?.shippingMethods.find(({ code }) => code === data.shippingMethod);
+
+        if (!selectedShippingMethod) {
+            return;
+        }
+
         mutate({
+            shipmentPrice: selectedShippingMethod.price,
             shippingMethod: data.shippingMethod,
             shippingAddress: data.shippingAddress as z.infer<typeof addressSchema>,
         });
@@ -416,6 +427,15 @@ export default function CheckoutForm({
                                     }
 
                                     field.onChange(event)
+
+                                    const selectedShippingMethod = shippingMethods.find(({ code }) => code === event);
+
+                                    if (!selectedShippingMethod) {
+                                        // should never happen
+                                        return;
+                                    }
+
+                                    setShipmentPrice(selectedShippingMethod.price);
                                 }}
                                 defaultValue={field.value}
                                 className="flex flex-col space-y-1"

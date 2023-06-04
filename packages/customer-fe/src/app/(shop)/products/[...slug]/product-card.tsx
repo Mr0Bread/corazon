@@ -11,6 +11,8 @@ import {
 } from '~/components/ui/card';
 import Image from "next/image";
 import QuickAddButton from "./quick-add-button";
+import Link from "next/link";
+import { ExternalLink } from "lucide-react";
 
 export default async function ProductCard({
     id
@@ -39,8 +41,6 @@ export default async function ProductCard({
 
     const images = JSON.parse(product.images as string) as { images: string[] };
 
-    await new Promise(resolve => setTimeout(resolve, 1000));
-
     return (
         <Card
             className="flex flex-col h-[400px]"
@@ -49,7 +49,19 @@ export default async function ProductCard({
                 className="px-2"
             >
                 <CardTitle>
-                    {product.name}
+                    <Link
+                        href={`/product/${product.name.replace(/\s/g, '-').toLowerCase()}-${product.id}`}
+                    >
+                        <span
+                            className="hover:underline"
+                        >
+                            {product.name}
+                            <ExternalLink
+                                className="inline-block ml-1"
+                                size={16}
+                            />
+                        </span>
+                    </Link>
                 </CardTitle>
             </CardHeader>
             <CardContent
@@ -73,7 +85,7 @@ export default async function ProductCard({
                 className="px-2 flex flex-col items-start pb-2"
             >
                 <div>
-                    {`${product.price}$`}
+                    {`${new Intl.NumberFormat('en-US').format(product.price/100)}$`}
                 </div>
                 <CardDescription>
                     {product.description}

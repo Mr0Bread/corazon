@@ -1,6 +1,6 @@
 import { int, json, mysqlTable, serial, uniqueIndex, varchar, primaryKey, index, timestamp } from 'drizzle-orm/mysql-core';
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
-import { InferModel, sql } from 'drizzle-orm'
+import { InferModel, relations } from 'drizzle-orm'
 import { z } from 'zod';
 
 export const products = mysqlTable(
@@ -185,3 +185,29 @@ export const orderItemsSelectSchema = createSelectSchema(orderItems);
 export type OrderItemsSelectSchema = z.infer<typeof orderItemsSelectSchema>;
 export type OrderItemModel = InferModel<typeof orderItems>;
 
+export const ordersRelations = relations(
+    orders,
+    ({ many }) => ({
+        orderItems: many(orderItems) 
+    })
+)
+
+export const orderItemsRelations = relations(
+    orderItems,
+    ({ one }) => ({
+        order: one(
+            orders,
+            {
+                fields: [orderItems.orderId],
+                references: [orders.id]
+            }
+        ),
+        product: one(
+            products,
+            {
+                fields: [orderItems.productId],
+                references: [products.id]
+            }
+        )
+    })
+)

@@ -71,8 +71,10 @@ export default function CartItem({
                         <X
                             size={12}
                         />
-                        <div>
-                            {`${new Intl.NumberFormat('en-US').format(price)}$`}
+                        <div
+                            className="text-orange-300"
+                        >
+                            {`${new Intl.NumberFormat('en-US').format(price/100)}$`}
                         </div>
                     </div>
                 </div>

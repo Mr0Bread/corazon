@@ -9,7 +9,9 @@ import {
   productsToCategories,
   orders,
   orderAddresses,
-  orderItems
+  orderItems,
+  orderItemsRelations,
+  ordersRelations
 } from './schema'
 
 export const db = drizzle(
@@ -29,7 +31,9 @@ export const db = drizzle(
       productsToCategories,
       orders,
       orderAddresses,
-      orderItems
+      orderItems,
+      orderItemsRelations,
+      ordersRelations
     }
   }
 );

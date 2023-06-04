@@ -1,9 +1,6 @@
 import { kv } from "@vercel/kv";
 import { auth } from "@clerk/nextjs";
 import CartItems from "./cart-items";
-import Link from "next/link";
-import { Button } from "~/components/ui/button";
-import { CreditCard } from "lucide-react";
 
 export default async function Cart() {
     const { userId } = auth();
@@ -28,35 +25,26 @@ export default async function Cart() {
 
         return (
             <div
-                className="text-foreground/90"
+                className="text-foreground/90 relative h-full"
             >
-                Your cart is empty
+                <CartItems
+                    items={[]}
+                    total={0}
+                />
             </div>
         );
     }
 
-    const { items = [], total } = redisCart as any;
-
-    const isCartEmpty = items.length === 0;
+    const { items = [], total = 0 } = redisCart as any;
 
     return (
         <div
             className="text-foreground/90 relative h-full"
         >
-            {
-                !isCartEmpty ? (
-                    <CartItems
-                        items={items}
-                        total={total}
-                    />
-                ) : (
-                    <div
-                        className="text-foreground/90"
-                    >
-                        Your cart is empty
-                    </div>
-                )
-            }
+            <CartItems
+                items={items}
+                total={total}
+            />
         </div>
     );
 }

@@ -1,4 +1,4 @@
-import { User, Package, MapPin } from 'lucide-react'
+import { User, Package, Heart } from 'lucide-react'
 import Link from 'next/link';
 import { Button } from '~/components/ui/button';
 
@@ -14,9 +14,9 @@ const links = [
         icon: <Package className='mr-2' />
     },
     {
-        label: 'Addresses',
-        href: '/my-account/addresses',
-        icon: <MapPin className='mr-2' />
+        label: 'Wishlist',
+        href: '/my-account/wishlist',
+        icon: <Heart className='mr-2' />
     }
 ];
 
