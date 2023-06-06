@@ -185,10 +185,42 @@ export const orderItemsSelectSchema = createSelectSchema(orderItems);
 export type OrderItemsSelectSchema = z.infer<typeof orderItemsSelectSchema>;
 export type OrderItemModel = InferModel<typeof orderItems>;
 
+export const wishlistedProducts = mysqlTable(
+    'wishlisted_products',
+    {
+        id: serial('id').primaryKey(),
+        userId: varchar('user_id', { length: 256 }).notNull(),
+        productId: int('product_id').notNull(),
+    },
+    (table) => ({
+        userIdIdx: index('user_id_idx').on(table.userId)
+    })
+)
+
+export const wishlistedProductsInsertSchema = createInsertSchema(wishlistedProducts);
+export type WishlistedProductsInsertSchema = z.infer<typeof wishlistedProductsInsertSchema>;
+export const wishlistedProductsSelectSchema = createSelectSchema(wishlistedProducts);
+export type WishlistedProductsSelectSchema = z.infer<typeof wishlistedProductsSelectSchema>;
+export type WishlistedProductModel = InferModel<typeof wishlistedProducts>;
+
 export const ordersRelations = relations(
     orders,
-    ({ many }) => ({
-        orderItems: many(orderItems) 
+    ({ many, one }) => ({
+        orderItems: many(orderItems),
+        orderAddress: one(orderAddresses)
+    })
+)
+
+export const orderAddressesRelations = relations(
+    orderAddresses,
+    ({ one}) => ({
+        order: one(
+            orders,
+            {
+                fields: [orderAddresses.orderId],
+                references: [orders.id]
+            }
+        )
     })
 )
 

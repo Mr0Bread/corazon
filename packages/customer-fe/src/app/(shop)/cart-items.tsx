@@ -85,7 +85,7 @@ export default function CartItems({
                     <div
                         className="font-bold text-orange-400"
                     >
-                        ${new Intl.NumberFormat('en-US').format(total/100)}
+                        ${new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(total/100)}
                     </div>
                 </div>
                 <div

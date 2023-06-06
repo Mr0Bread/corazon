@@ -60,8 +60,6 @@ export default async function Page({ params }: { params: { slug: string[] } }) {
                             key={linkedProduct.productId}
                             fallback={<ProductCardFallback />}
                         >
-                            {/* eslint-disable-next-line @typescript-eslint/ban-ts-comment */}
-                            {/* @ts-expect-error */}
                             <ProductCard
                                 id={linkedProduct.productId}
                             />

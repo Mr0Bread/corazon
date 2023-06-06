@@ -7,12 +7,15 @@ import { useUser } from "@clerk/clerk-react";
 import { useToast } from "~/components/ui/use-toast";
 import { api } from "~/utils/api";
 import { trpc } from "~/utils/trpc";
+import { useAtomValue } from "jotai";
+import { refetchCartAtom } from "../../cart-items";
 
 export default function QuickAddButton({
     productId
 }: {
     productId: number
 }) {
+    const { refetch: refetchCart } = useAtomValue(refetchCartAtom);
     const { isSignedIn } = useUser();
     const { toast } = useToast();
     const utils = trpc.useContext();
@@ -21,8 +24,7 @@ export default function QuickAddButton({
         isLoading
     } = api.cart.addToCart.useMutation({
         onSuccess: async () => {
-            await utils.cart.getCart.invalidate();
-            utils.cart.getCart.refetch();
+            refetchCart();
         }
     });
     const onClick = useCallback(async () => {
@@ -39,13 +41,13 @@ export default function QuickAddButton({
             productId,
             quantity: 1
         });
-    }, []);
+    }, [isSignedIn]);
 
     return (
         <Button
             onClick={onClick}
             variant="secondary"
-            className="mt-4 text-foreground/70 hover:text-foreground/90"
+            className="text-foreground/70 hover:text-foreground/90"
         >
             {
                 isLoading ? (

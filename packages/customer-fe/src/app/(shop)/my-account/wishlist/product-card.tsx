@@ -10,7 +10,7 @@ import {
     CardTitle
 } from '~/components/ui/card';
 import Image from "next/image";
-import QuickAddButton from "./quick-add-button";
+import QuickAddButton from "../../products/[...slug]/quick-add-button";
 import Link from "next/link";
 import { ExternalLink } from "lucide-react";
 

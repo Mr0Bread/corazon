@@ -53,6 +53,68 @@ export const cartRouter = createTRPCRouter({
                 total
             }));
         }),
+    decreaseQuantity: publicProcedure
+        .input(
+            z.object({
+                productId: z.number(),
+            })
+        )
+        .mutation(async ({ input: { productId }, ctx: { auth: { userId } } }) => {
+            const cart = await kv.get(`cart-${userId}`);
+            const { items = [] } = cart as any;
+
+            const newItems = items
+                .map((item: any) => {
+                    if (item.productId === productId) {
+                        item.quantity -= 1;
+                    }
+
+                    return item;
+                })
+                .filter((item: any) => item.quantity > 0);
+
+            // calculate total
+            const total = newItems.reduce((acc: number, item: any) => {
+                return acc + (item.price * item.quantity);
+            }, 0);
+
+            await kv.set(`cart-${userId}`, JSON.stringify({
+                items: newItems,
+                total
+            }));
+        }),
+    setQuantity: publicProcedure
+        .input(
+            z.object({
+                productId: z.number(),
+                quantity: z.number(),
+            })
+        )
+        .mutation(async ({ input: { productId, quantity }, ctx: { auth: { userId } } }) => {
+            const cart = await kv.get(`cart-${userId}`);
+            const { items = [] } = cart as any;
+
+            const newItems = items
+                .map((item: any) => {
+                    if (item.productId === productId) {
+                        item.quantity = quantity;
+                    }
+
+                    return item;
+                }
+            )
+
+            // calculate total
+            const total = newItems.reduce((acc: number, item: any) => {
+                return acc + (item.price * item.quantity);
+            }, 0);
+
+            await kv.set(`cart-${userId}`, JSON.stringify({
+                items: newItems,
+                total
+            }));
+
+        }),
     addToCart: publicProcedure
         .input(
             z.object({

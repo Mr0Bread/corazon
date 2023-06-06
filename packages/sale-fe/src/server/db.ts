@@ -11,7 +11,8 @@ import {
   orderAddresses,
   orderItems,
   orderItemsRelations,
-  ordersRelations
+  ordersRelations,
+  orderAddressesRelations
 } from './schema'
 
 export const db = drizzle(
@@ -33,7 +34,8 @@ export const db = drizzle(
       orderAddresses,
       orderItems,
       orderItemsRelations,
-      ordersRelations
+      ordersRelations,
+      orderAddressesRelations
     }
   }
 );

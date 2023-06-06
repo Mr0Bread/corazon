@@ -3,6 +3,7 @@ import Image from "next/image";
 import DeleteCartItemButton from "./detele-cart-item-button";
 import Link from "next/link";
 import { Button } from "~/components/ui/button";
+import QuantityButtons from "./quantity-buttons";
 
 export default function CartItem({
     name,
@@ -19,7 +20,7 @@ export default function CartItem({
 }) {
     return (
         <div
-            className="rounded border border-foreground/10 h-[100px] overflow-hidden"
+            className="rounded border border-foreground/10 h-[110px] overflow-hidden"
         >
             <div
                 className="flex h-full"
@@ -43,7 +44,7 @@ export default function CartItem({
                         className="flex justify-between items-center"
                     >
                         <Link
-                            href={`/product/${productId}`}
+                            href={`/product/${name.replace(/\s/g, '-').toLowerCase()}-${productId}`}
                         >
                             <Button
                                 variant="link"
@@ -60,23 +61,11 @@ export default function CartItem({
                             productId={productId}
                         />
                     </div>
-                    <div
-                        className="flex items-center gap-2"
-                    >
-                        <div
-                            className="rounded border p-1 w-8 text-center"
-                        >
-                            {quantity}
-                        </div>
-                        <X
-                            size={12}
-                        />
-                        <div
-                            className="text-orange-300"
-                        >
-                            {`${new Intl.NumberFormat('en-US').format(price/100)}$`}
-                        </div>
-                    </div>
+                    <QuantityButtons
+                        price={price}
+                        quantity={quantity}
+                        productId={productId}
+                    />
                 </div>
             </div>
         </div>

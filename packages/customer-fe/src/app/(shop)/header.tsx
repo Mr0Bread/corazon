@@ -5,7 +5,7 @@ import ProfilePopover from './profile-popover';
 const Header: React.FC = () => {
   return (
     <header
-      className="sticky flex flex-row items-center justify-center py-4 w-full"
+      className="sticky flex flex-row items-center justify-center py-4 w-full z-50"
     >
       <div
         className="max-w-7xl w-full px-6"
