@@ -3,9 +3,27 @@ import { Button } from "~/components/ui/button";
 import { db } from "~/server/db";
 import { products } from "~/server/schema";
 import GoodsTable from "./table";
+import { currentUser } from "@clerk/nextjs";
+import { eq } from "drizzle-orm";
 
 export default async function Page() {
-    const goods = await db.select().from(products).limit(10);
+    const user = await currentUser();
+
+    if (!user) {
+        return (
+            <div>
+                {`You must be logged in to view this page`}
+            </div>
+        );
+    }
+
+    const goods = await db
+        .select()
+        .from(products)
+        .where(
+            eq(products.userId, user.id)
+        )
+        .limit(10);
 
     return (
         <div>

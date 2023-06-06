@@ -10,6 +10,8 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table"
+import { Button } from "@/components/ui/button"
+import Link from "next/link";
 
 const columns: ColumnDef<Omit<ProductsSelectSchema, 'images'>>[] = [
     {
@@ -27,6 +29,30 @@ const columns: ColumnDef<Omit<ProductsSelectSchema, 'images'>>[] = [
     {
         header: "Quantity",
         accessorKey: "quantity",
+    },
+    {
+        header: "Actions",
+        cell: ({ row: { original } }) => (
+            <div className="flex gap-2">
+                <Link
+                    href={`/dashboard/goods/${original.id}`}
+                >
+                    <Button
+                        variant="secondary"
+                        size="sm"
+                    >
+                        Edit
+                    </Button>
+                </Link>
+                <Button
+                    variant="destructive"
+                    className="bg-red-500"
+                    size="sm"
+                >
+                    Delete
+                </Button>
+            </div>
+        )
     }
 ];
 

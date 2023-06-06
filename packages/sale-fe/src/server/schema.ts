@@ -29,7 +29,6 @@ export const categories = mysqlTable(
         name: varchar('name', { length: 256 }).notNull(),
         slug: varchar('slug', { length: 256 }).notNull(),
         parentId: int('parent_id'),
-        children: json('children'),
         description: varchar('description', { length: 256 }).notNull(),
     },
     (table) => ({
@@ -42,6 +41,25 @@ export type CategoriesInsertSchema = z.infer<typeof categoriesInsertSchema>;
 export const categoriesSelectSchema = createSelectSchema(categories);
 export type CategoriesSelectSchema = z.infer<typeof categoriesSelectSchema>;
 export type CategoryModel = InferModel<typeof categories>;
+
+export const categoriesToChildren = mysqlTable(
+    'categories_to_children',
+    {
+        parentId: int('parent_id').notNull(),
+        childId: int('child_id').notNull(),
+    },
+    (table) => ({
+        pk: primaryKey(table.parentId, table.childId),
+        parentIdIdx: index('parent_id_idx').on(table.parentId),
+        childIdIdx: index('child_id_idx').on(table.childId),
+    })
+)
+
+export const categoriesToChildrenInsertSchema = createInsertSchema(categoriesToChildren);
+export type CategoriesToChildrenInsertSchema = z.infer<typeof categoriesToChildrenInsertSchema>;
+export const categoriesToChildrenSelectSchema = createSelectSchema(categoriesToChildren);
+export type CategoriesToChildrenSelectSchema = z.infer<typeof categoriesToChildrenSelectSchema>;
+export type CategoryToChildModel = InferModel<typeof categoriesToChildren>;
 
 export const productsToCategories = mysqlTable(
     'products_to_categories',
