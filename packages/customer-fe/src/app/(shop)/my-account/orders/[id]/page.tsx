@@ -19,7 +19,7 @@ export default async function Page({
         .select()
         .from(ordersTable)
         .where(
-            eq(ordersTable.id, id)
+            eq(ordersTable.id, Number(id))
         ))[0]
 
     if (!order) {

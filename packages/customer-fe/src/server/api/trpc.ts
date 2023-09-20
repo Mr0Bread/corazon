@@ -16,10 +16,9 @@
  */
 import { type CreateNextContextOptions } from "@trpc/server/adapters/next";
 import { getAuth } from '@clerk/nextjs/server'
-import type { SignedInAuthObject,SignedOutAuthObject } from "@clerk/nextjs/dist/api";
 
 interface AuthContext {
-  auth: SignedInAuthObject | SignedOutAuthObject;
+  auth: any;
 }
 
 /**
@@ -62,7 +61,7 @@ export const createTRPCContext = async (opts: CreateNextContextOptions) => {
 import { initTRPC, TRPCError } from "@trpc/server";
 import superjson from "superjson";
 
-const t = initTRPC.context<{ auth: SignedInAuthObject | SignedOutAuthObject }>().create({
+const t = initTRPC.context<{ auth: any }>().create({
   transformer: superjson,
   errorFormatter({ shape }) {
     return shape;

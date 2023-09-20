@@ -9,10 +9,10 @@ import { refetchCartAtom } from "./cart-items"
 import { Plus, Minus } from "lucide-react"
 import { Input } from "~/components/ui/input"
 
-function debounce(callback, delay = 500) {
-    var time;
+function debounce(callback: Function, delay = 500) {
+    let time: ReturnType<typeof setTimeout>;
 
-    return (...args) => {
+    return (...args: any[]) => {
         clearTimeout(time);
         time = setTimeout(() => {
             callback(...args);
@@ -59,16 +59,18 @@ export default function QuantityButtons({
     const isLoading = isIncreasing || isDecreasing || isSettingQuantity
 
     useEffect(() => {
-        setQuantityState(quantity)
+        setQuantityState(String(quantity))
     }, [quantity])
 
     const debouncedSetQuantity = debounce(
+        // @ts-ignore
         (newQuantityNumber) => setQuantity({
             productId,
             quantity: newQuantityNumber
         })
     )
     const onInputChange = useCallback(
+        // @ts-ignore
         (e) => {
             const newQuantity = e.target.value
 

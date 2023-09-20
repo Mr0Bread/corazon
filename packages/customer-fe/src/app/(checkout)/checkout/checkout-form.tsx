@@ -30,7 +30,6 @@ import { Loader2, CreditCard } from "lucide-react";
 import { cn } from "~/lib/utils";
 import { useState } from "react";
 import { useUser } from "@clerk/nextjs";
-import type { UserResource } from '@clerk/types';
 import { api } from "~/utils/api";
 import { atom, useAtom } from "jotai";
 
@@ -91,7 +90,9 @@ export default function CheckoutForm({
         );
     }
 
-    const { firstName, lastName } = user as UserResource;
+    if (!user) return null
+
+    const { firstName, lastName } = user;
     const {
         mutate,
         isLoading: isProceedingToPayment

@@ -20,7 +20,7 @@ export default function OrderTotal({
                 Total
             </div>
             <div>
-                {`${new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format((grandTotal/100).toFixed(2))}$`}
+                {`${new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(Number((grandTotal/100).toFixed(2)))}$`}
             </div>
         </div>
     );
