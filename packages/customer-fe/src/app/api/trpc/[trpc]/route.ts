@@ -33,4 +33,12 @@ const handler = async (request: Request) => {
     return response;
 };
 
+export function OPTIONS() {
+    const response = new Response(null, {
+      status: 204,
+    });
+    setCorsHeaders(response);
+    return response;
+  }
+
 export { handler as GET, handler as POST };
