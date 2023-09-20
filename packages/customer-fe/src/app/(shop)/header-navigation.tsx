@@ -10,18 +10,20 @@ import {
     NavigationMenuTrigger,
     navigationMenuTriggerStyle,
 } from "@/components/ui/navigation-menu"
+import MenuButton from './menu-button';
 
 const HeaderNavigation = () => {
     return (
         <NavigationMenu>
             <NavigationMenuList>
                 <NavigationMenuItem
-                    className="text-foreground/60"
+                    className="text-foreground/80 border border-input rounded-md"
                 >
                     <Link
                         href="/"
                         legacyBehavior
                         passHref
+                        className='h-[38px]'
                     >
                         <NavigationMenuLink className={navigationMenuTriggerStyle()}>
                             Home
@@ -30,7 +32,7 @@ const HeaderNavigation = () => {
                 </NavigationMenuItem>
                 <NavigationMenuItem>
                     <NavigationMenuTrigger
-                        className="text-foreground/60"
+                        className="text-foreground/80 border border-input"
                     >
                         Products
                     </NavigationMenuTrigger>
@@ -43,7 +45,7 @@ const HeaderNavigation = () => {
                                     href="/products/all"
                                 >
                                     <div
-                                        className="flex flex-col items-start gap-1 hover:bg-slate-800 transition-all p-2 rounded h-full"
+                                        className="flex flex-col items-start gap-1 hover:bg-slate-800 hover:text-foreground transition-all p-2 rounded h-full"
                                     >
                                         <div>
                                             All
@@ -61,7 +63,7 @@ const HeaderNavigation = () => {
                                     href="/products/best-sellers"
                                 >
                                     <div
-                                        className="flex flex-col items-start gap-1 hover:bg-slate-800 transition-all p-2 rounded h-full"
+                                        className="flex flex-col items-start gap-1 hover:bg-slate-800 hover:text-foreground transition-all p-2 rounded h-full"
                                     >
                                         <div>
                                             Best Sellers
@@ -76,6 +78,9 @@ const HeaderNavigation = () => {
                             </li>
                         </ul>
                     </NavigationMenuContent>
+                </NavigationMenuItem>
+                <NavigationMenuItem>
+                    <MenuButton />
                 </NavigationMenuItem>
             </NavigationMenuList>
         </NavigationMenu>

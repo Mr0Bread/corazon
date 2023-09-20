@@ -1,7 +1,6 @@
 'use client';
 
-import { type ProductsSelectSchema } from "~/server/schema";
-import { ColumnDef, useReactTable, getCoreRowModel, flexRender } from "@tanstack/react-table"
+import { useReactTable, getCoreRowModel, flexRender, ColumnDef } from "@tanstack/react-table"
 import {
     Table,
     TableBody,
@@ -12,53 +11,74 @@ import {
 } from "@/components/ui/table"
 import { Button } from "@/components/ui/button"
 import Link from "next/link";
-
-const columns: ColumnDef<Omit<ProductsSelectSchema, 'images'>>[] = [
-    {
-        header: "ID",
-        accessorKey: "id",
-    },
-    {
-        header: "Name",
-        accessorKey: "name",
-    },
-    {
-        header: "Price",
-        accessorKey: "price",
-    },
-    {
-        header: "Quantity",
-        accessorKey: "quantity",
-    },
-    {
-        header: "Actions",
-        cell: ({ row: { original } }) => (
-            <div className="flex gap-2">
-                <Link
-                    href={`/dashboard/goods/${original.id}`}
-                >
-                    <Button
-                        variant="secondary"
-                        size="sm"
-                    >
-                        Edit
-                    </Button>
-                </Link>
-                <Button
-                    variant="destructive"
-                    className="bg-red-500"
-                    size="sm"
-                >
-                    Delete
-                </Button>
-            </div>
-        )
-    }
-];
+import { ProductsSelectSchema } from '@/server/schema';
+import { api } from "~/utils/api";
+import { useRouter } from "next/navigation";
 
 const GoodsTable: React.FC<{ goods: Omit<ProductsSelectSchema, 'images'>[] }> = ({ goods }) => {
+    const router = useRouter()
+
+    const {
+        isLoading,
+        mutate: deleteProduct
+    } = api.products.delete.useMutation({
+        onSuccess() {
+            router.refresh()
+        }
+    })
+
     const table = useReactTable({
-        columns,
+        columns: [
+            {
+                header: "ID",
+                accessorKey: "id",
+            },
+            {
+                header: "Name",
+                accessorKey: "name",
+            },
+            {
+                header: "Price",
+                cell: ({ row: { original: { finalPrice } } }) => (
+                    <div>
+                        {`${new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(finalPrice / 100)}$`}
+                    </div>
+                )
+            },
+            {
+                header: "Quantity",
+                accessorKey: "quantity",
+            },
+            {
+                header: "Actions",
+                cell: ({ row: { original } }) => (
+                    <div className="flex gap-2">
+                        <Link
+                            href={`/dashboard/goods/${original.id}`}
+                        >
+                            <Button
+                                variant="secondary"
+                                size="sm"
+                            >
+                                Edit
+                            </Button>
+                        </Link>
+                        <Button
+                            variant="destructive"
+                            className="bg-red-500"
+                            size="sm"
+                            onClick={() => {
+                                deleteProduct({
+                                    id: original.id
+                                })
+                            }}
+                        >
+                            Delete
+                        </Button>
+                    </div>
+                )
+            }
+        ],
         data: goods,
         getCoreRowModel: getCoreRowModel()
     });
@@ -100,7 +120,7 @@ const GoodsTable: React.FC<{ goods: Omit<ProductsSelectSchema, 'images'>[] }> = 
                         ))
                     ) : (
                         <TableRow>
-                            <TableCell colSpan={columns.length} className="h-24 text-center">
+                            <TableCell colSpan={5} className="h-24 text-center">
                                 No results.
                             </TableCell>
                         </TableRow>

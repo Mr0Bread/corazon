@@ -13,6 +13,7 @@ import Image from "next/image";
 import QuickAddButton from "./quick-add-button";
 import Link from "next/link";
 import { ExternalLink } from "lucide-react";
+import clsx from "clsx";
 
 export default async function ProductCard({
     id
@@ -40,6 +41,10 @@ export default async function ProductCard({
     const product = products[0];
 
     const images = JSON.parse(product.images as string) as { images: string[] };
+
+    const {
+        discountAmount
+    } = product;
 
     return (
         <Card
@@ -84,8 +89,21 @@ export default async function ProductCard({
             <CardFooter
                 className="px-2 flex flex-col items-start pb-2"
             >
-                <div>
-                    {`${new Intl.NumberFormat('en-US').format(product.price / 100)}$`}
+                {
+                    discountAmount ? (
+                        <div
+                            className="line-through text-foreground/70"
+                        >
+                            {`${new Intl.NumberFormat('en-US').format(product.basePrice / 100)}$`}
+                        </div>
+                    ) : null
+                }
+                <div
+                    className={clsx({
+                        'text-orange-400': discountAmount > 0
+                    })}
+                >
+                    {`${new Intl.NumberFormat('en-US').format(product.finalPrice / 100)}$`}
                 </div>
                 <CardDescription>
                     {product.description}

@@ -92,7 +92,7 @@ export default async function OrderSummary() {
                                                 <div
                                                     className="text-sm text-foreground/90"
                                                 >
-                                                    {`${new Intl.NumberFormat('en-US').format(price)}$`}
+                                                    {`${new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(price / 100)}$`}
                                                 </div>
                                             </div>
                                         </div>

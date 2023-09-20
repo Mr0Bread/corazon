@@ -14,7 +14,8 @@ export default function CartButton() {
             <SheetTrigger asChild>
                 <Button
                     variant="outline"
-                    className="text-foreground/80"
+                    className="text-foreground/80 bg-background"
+                    test-id="cart-button"
                 >
                     <ShoppingBag
                         size={24}
@@ -22,7 +23,10 @@ export default function CartButton() {
                 </Button>
             </SheetTrigger>
             <SheetContent
-                className="pt-10"
+                className="pt-10 w-full md:w-1/2 lg:w-1/3"
+                closeProps={{
+                    "test-id": 'cart-close-button'
+                }}
             >
                 <Suspense fallback={<div>Loading...</div>}>
                     <Cart />

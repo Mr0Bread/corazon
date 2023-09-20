@@ -6,7 +6,6 @@ import { PlusCircle, Loader2 } from "lucide-react";
 import { useUser } from "@clerk/clerk-react";
 import { useToast } from "~/components/ui/use-toast";
 import { api } from "~/utils/api";
-import { trpc } from "~/utils/trpc";
 import { useAtomValue } from "jotai";
 import { refetchCartAtom } from "../../cart-items";
 
@@ -18,13 +17,17 @@ export default function QuickAddButton({
     const { refetch: refetchCart } = useAtomValue(refetchCartAtom);
     const { isSignedIn } = useUser();
     const { toast } = useToast();
-    const utils = trpc.useContext();
     const {
         mutate,
         isLoading
     } = api.cart.addToCart.useMutation({
         onSuccess: async () => {
             refetchCart();
+
+            toast({
+                title: 'Product has been added to cart',
+                className: 'text-foreground/90'
+            });
         }
     });
     const onClick = useCallback(async () => {

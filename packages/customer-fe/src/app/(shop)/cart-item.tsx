@@ -1,4 +1,4 @@
-import { X, ExternalLink } from "lucide-react";
+import { ExternalLink } from "lucide-react";
 import Image from "next/image";
 import DeleteCartItemButton from "./detele-cart-item-button";
 import Link from "next/link";

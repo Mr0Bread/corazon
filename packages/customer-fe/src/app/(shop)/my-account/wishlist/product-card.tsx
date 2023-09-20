@@ -85,7 +85,7 @@ export default async function ProductCard({
                 className="px-2 flex flex-col items-start pb-2"
             >
                 <div>
-                    {`${new Intl.NumberFormat('en-US').format(product.price / 100)}$`}
+                    {`${new Intl.NumberFormat('en-US').format(product.finalPrice / 100)}$`}
                 </div>
                 <CardDescription>
                     {product.description}

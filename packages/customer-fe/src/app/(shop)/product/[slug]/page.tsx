@@ -20,14 +20,6 @@ export default async function Page({
 }) {
     const user = await currentUser();
 
-    if (!user) {
-        return (
-            <div>
-                {`You must be logged in to view this page`}
-            </div>
-        );
-    }
-
     const productId = Number(slug.split('-').pop());
 
     const product = (await db
@@ -48,7 +40,7 @@ export default async function Page({
         );
     }
 
-    const wishlistedProduct = (await db
+    const wishlistedProduct = user ? (await db
         .select()
         .from(wishlistedProductsTable)
         .where(
@@ -56,21 +48,23 @@ export default async function Page({
                 eq(wishlistedProductsTable.productId, productId),
                 eq(wishlistedProductsTable.userId, user.id)
             )
-        ))[0]
+        ))[0] : null;
     const isWished = Boolean(wishlistedProduct);
 
     const {
         name,
         images: imagesJson,
         description,
-        price
+        basePrice,
+        discountAmount,
+        finalPrice
     } = product;
 
     const images = JSON.parse(imagesJson as string) as { images: string[] };
 
     return (
         <div
-            className="max-w-7xl px-10 mt-8"
+            className="max-w-7xl px-10"
         >
             <h2
                 className="text-foreground/90 scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight transition-colors first:mt-0"
@@ -96,11 +90,35 @@ export default async function Page({
                     >
                         {description}
                     </div>
-                    <div
-                        className="text-xl font-semibold text-foreground/90 mt-4"
-                    >
-                        Price: <span className="text-orange-400">{`$${new Intl.NumberFormat('en-US', { maximumFractionDigits: 2, minimumFractionDigits: 2 }).format(price / 100)}`}</span>
-                    </div>
+                    {
+                        discountAmount > 0 ? (
+                            <div
+                                className="grid grid-cols-[max-content_auto] grid-rows-2 gap-x-2 mt-4"
+                            >
+                                <div
+                                    className="line-through text-foreground/60 col-start-2"
+                                >
+                                    {`$${new Intl.NumberFormat('en-US', { maximumFractionDigits: 2, minimumFractionDigits: 2 }).format(basePrice / 100)}`}
+                                </div>
+                                <div
+                                    className="text-xl font-semibold text-foreground/90 col-start-1 row-start-2"
+                                >
+                                    Price:
+                                </div>
+                                <div
+                                    className="text-orange-300 text-xl col-start-2 row-start-2"
+                                >
+                                {`$${new Intl.NumberFormat('en-US', { maximumFractionDigits: 2, minimumFractionDigits: 2 }).format(finalPrice / 100)}`}
+                                </div>
+                            </div>
+                        ) : (
+                            <div
+                                className="text-xl font-semibold text-foreground/90 mt-4"
+                            >
+                                Price: <span className="text-orange-400">{`$${new Intl.NumberFormat('en-US', { maximumFractionDigits: 2, minimumFractionDigits: 2 }).format(finalPrice / 100)}`}</span>
+                            </div>
+                        )
+                    }
                     <div
                         className="flex gap-4 items-center mt-4"
                     >
@@ -114,6 +132,6 @@ export default async function Page({
                     </div>
                 </div>
             </div>
-        </div>
+        </div >
     )
 }

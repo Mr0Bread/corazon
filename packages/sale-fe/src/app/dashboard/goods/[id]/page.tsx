@@ -6,7 +6,6 @@ import {
     products as productsTable,
     productsToCategories as productsToCategoriesTable
 } from "~/server/schema";
-import { CategoriesSelectSchema } from "~/server/schema";
 import { currentUser } from "@clerk/nextjs";
 
 export default async function Page({
@@ -83,11 +82,11 @@ export default async function Page({
                 {`Edit Product: ${product.name}`}
             </h2>
             <ProductForm
-                categories={categories as CategoriesSelectSchema[]}
+                categories={categories}
                 product={{
                     ...product,
                     categories: assignedCategories as string[],
-                    price: String(product.price),
+                    basePrice: String(product.basePrice),
                     quantity: String(product.quantity),
                     images: imagesJson.images
                 }}

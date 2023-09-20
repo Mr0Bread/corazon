@@ -1,19 +1,22 @@
 import { drizzle } from "drizzle-orm/planetscale-serverless";
 import { connect } from "@planetscale/database";
-import {
+import { 
   categories,
+  categoriesToChildren,
   configs,
   products,
-  parcelLocations,
-  countries,
+  wishlistedProducts,
   productsToCategories,
+  countries,
+  menuItems,
+  menus,
   orders,
-  orderAddresses,
   orderItems,
-  orderItemsRelations,
-  ordersRelations,
-  orderAddressesRelations
+  orderAddresses,
+  parcelLocations
 } from './schema'
+import { log } from 'next-axiom'
+import { DefaultLogger } from 'drizzle-orm';
 
 export const db = drizzle(
   connect({
@@ -22,20 +25,28 @@ export const db = drizzle(
     password: process.env.DATABASE_PASSWORD
   }),
   {
-    logger: true,
+    logger: new DefaultLogger({
+      writer: {
+        write(message) {
+            console.log(message)
+            log.info(`Database ${message}`)
+        },
+      }
+    }),
     schema: {
       categories,
+      categoriesToChildren,
       configs,
       products,
-      parcelLocations,
-      countries,
+      wishlistedProducts,
       productsToCategories,
+      countries,
+      menuItems,
+      menus,
       orders,
-      orderAddresses,
       orderItems,
-      orderItemsRelations,
-      ordersRelations,
-      orderAddressesRelations
+      orderAddresses,
+      parcelLocations
     }
   }
 );

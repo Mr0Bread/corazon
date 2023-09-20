@@ -1,5 +1,6 @@
 // app/layout.tsx
 import '../../styles/globals.css'
+import { AxiomWebVitals } from 'next-axiom';
 import { ClerkProvider } from '@clerk/nextjs'
 import { Inter as FontSans } from 'next/font/google'
 import Header from './header'
@@ -23,8 +24,9 @@ export default function RootLayout({
       <TrpcProvider>
         <JotaiProvider>
           <html lang="en" className={`${fontSans.className} dark`}>
+            <AxiomWebVitals />
             <body className="min-h-screen bg-background text-gray-900 antialiased flex flex-col items-center">
-              <div className="max-w-7xl w-full">
+              <div className="max-w-7xl w-full flex-1 flex flex-col">
                 <Header />
                 {children}
                 <Toaster />

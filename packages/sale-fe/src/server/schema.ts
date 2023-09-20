@@ -1,26 +1,28 @@
 import { int, json, mysqlTable, serial, uniqueIndex, varchar, primaryKey, index, timestamp } from 'drizzle-orm/mysql-core';
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
-import { InferModel, relations } from 'drizzle-orm'
-import { z } from 'zod';
+import * as z from 'zod';
 
 export const products = mysqlTable(
     'products',
     {
         id: serial('id').primaryKey(),
-        price: int('price').notNull(),
         name: varchar('name', { length: 256 }).notNull(),
         description: varchar('description', { length: 256 }).notNull(),
         quantity: int('quantity').notNull(),
         userId: varchar('user_id', { length: 256 }).notNull(),
         images: json('images'),
+        basePrice: int('base_price').notNull(),
+        discountPercentage: int('discount_percentage').notNull(),
+        discountAmount: int('discount_amount').notNull(),
+        finalPrice: int('final_price').notNull(),
+        createdAt: timestamp('created_at').defaultNow().notNull(),
+        updatedAt: timestamp('updated_at').defaultNow().onUpdateNow().notNull(),
     }
 );
 
 export const productsInsertSchema = createInsertSchema(products);
-export type ProductsInsertSchema = z.infer<typeof productsInsertSchema>;
 export const productsSelectSchema = createSelectSchema(products);
 export type ProductsSelectSchema = z.infer<typeof productsSelectSchema>;
-export type ProductModel = InferModel<typeof products>;
 
 export const categories = mysqlTable(
     'categories',
@@ -37,10 +39,8 @@ export const categories = mysqlTable(
 );
 
 export const categoriesInsertSchema = createInsertSchema(categories);
-export type CategoriesInsertSchema = z.infer<typeof categoriesInsertSchema>;
 export const categoriesSelectSchema = createSelectSchema(categories);
 export type CategoriesSelectSchema = z.infer<typeof categoriesSelectSchema>;
-export type CategoryModel = InferModel<typeof categories>;
 
 export const categoriesToChildren = mysqlTable(
     'categories_to_children',
@@ -56,10 +56,7 @@ export const categoriesToChildren = mysqlTable(
 )
 
 export const categoriesToChildrenInsertSchema = createInsertSchema(categoriesToChildren);
-export type CategoriesToChildrenInsertSchema = z.infer<typeof categoriesToChildrenInsertSchema>;
 export const categoriesToChildrenSelectSchema = createSelectSchema(categoriesToChildren);
-export type CategoriesToChildrenSelectSchema = z.infer<typeof categoriesToChildrenSelectSchema>;
-export type CategoryToChildModel = InferModel<typeof categoriesToChildren>;
 
 export const productsToCategories = mysqlTable(
     'products_to_categories',
@@ -75,10 +72,7 @@ export const productsToCategories = mysqlTable(
 );
 
 export const productsToCategoriesInsertSchema = createInsertSchema(productsToCategories);
-export type ProductsToCategoriesInsertSchema = z.infer<typeof productsToCategoriesInsertSchema>;
 export const productsToCategoriesSelectSchema = createSelectSchema(productsToCategories);
-export type ProductsToCategoriesSelectSchema = z.infer<typeof productsToCategoriesSelectSchema>;
-export type ProductToCategoryModel = InferModel<typeof productsToCategories>;
 
 export const configs = mysqlTable(
     'configs',
@@ -93,10 +87,7 @@ export const configs = mysqlTable(
 );
 
 export const configsInsertSchema = createInsertSchema(configs);
-export type ConfigsInsertSchema = z.infer<typeof configsInsertSchema>;
 export const configsSelectSchema = createSelectSchema(configs);
-export type ConfigsSelectSchema = z.infer<typeof configsSelectSchema>;
-export type ConfigModel = InferModel<typeof configs>;
 
 export const countries = mysqlTable(
     'countries',
@@ -111,10 +102,7 @@ export const countries = mysqlTable(
 );
 
 export const countriesInsertSchema = createInsertSchema(countries);
-export type CountriesInsertSchema = z.infer<typeof countriesInsertSchema>;
 export const countriesSelectSchema = createSelectSchema(countries);
-export type CountriesSelectSchema = z.infer<typeof countriesSelectSchema>;
-export type CountryModel = InferModel<typeof countries>;
 
 export const parcelLocations = mysqlTable(
     'parcel_locations',
@@ -132,10 +120,7 @@ export const parcelLocations = mysqlTable(
 );
 
 export const parcelLocationsInsertSchema = createInsertSchema(parcelLocations);
-export type ParcelLocationsInsertSchema = z.infer<typeof parcelLocationsInsertSchema>;
 export const parcelLocationsSelectSchema = createSelectSchema(parcelLocations);
-export type ParcelLocationsSelectSchema = z.infer<typeof parcelLocationsSelectSchema>;
-export type ParcelLocationModel = InferModel<typeof parcelLocations>;
 
 export const orders = mysqlTable(
     'orders',
@@ -155,10 +140,7 @@ export const orders = mysqlTable(
 );
 
 export const ordersInsertSchema = createInsertSchema(orders);
-export type OrdersInsertSchema = z.infer<typeof ordersInsertSchema>;
 export const ordersSelectSchema = createSelectSchema(orders);
-export type OrdersSelectSchema = z.infer<typeof ordersSelectSchema>;
-export type OrderModel = InferModel<typeof orders>;
 
 export const orderAddresses = mysqlTable(
     'order_addresses',
@@ -177,10 +159,7 @@ export const orderAddresses = mysqlTable(
 );
 
 export const orderAddressesInsertSchema = createInsertSchema(orderAddresses);
-export type OrderAddressesInsertSchema = z.infer<typeof orderAddressesInsertSchema>;
 export const orderAddressesSelectSchema = createSelectSchema(orderAddresses);
-export type OrderAddressesSelectSchema = z.infer<typeof orderAddressesSelectSchema>;
-export type OrderAddressModel = InferModel<typeof orderAddresses>;
 
 export const orderItems = mysqlTable(
     'order_items',
@@ -198,10 +177,7 @@ export const orderItems = mysqlTable(
 );
 
 export const orderItemsInsertSchema = createInsertSchema(orderItems);
-export type OrderItemsInsertSchema = z.infer<typeof orderItemsInsertSchema>;
 export const orderItemsSelectSchema = createSelectSchema(orderItems);
-export type OrderItemsSelectSchema = z.infer<typeof orderItemsSelectSchema>;
-export type OrderItemModel = InferModel<typeof orderItems>;
 
 export const wishlistedProducts = mysqlTable(
     'wishlisted_products',
@@ -216,48 +192,28 @@ export const wishlistedProducts = mysqlTable(
 )
 
 export const wishlistedProductsInsertSchema = createInsertSchema(wishlistedProducts);
-export type WishlistedProductsInsertSchema = z.infer<typeof wishlistedProductsInsertSchema>;
 export const wishlistedProductsSelectSchema = createSelectSchema(wishlistedProducts);
-export type WishlistedProductsSelectSchema = z.infer<typeof wishlistedProductsSelectSchema>;
-export type WishlistedProductModel = InferModel<typeof wishlistedProducts>;
 
-export const ordersRelations = relations(
-    orders,
-    ({ many, one }) => ({
-        orderItems: many(orderItems),
-        orderAddress: one(orderAddresses)
-    })
+export const menus = mysqlTable(
+    'menus',
+    {
+        id: serial('id').primaryKey(),
+        identifier: varchar('name', { length: 256 }).notNull(),
+    }
 )
 
-export const orderAddressesRelations = relations(
-    orderAddresses,
-    ({ one}) => ({
-        order: one(
-            orders,
-            {
-                fields: [orderAddresses.orderId],
-                references: [orders.id]
-            }
-        )
-    })
-)
+export const menusInsertSchema = createInsertSchema(menus);
+export const menusSelectSchema = createSelectSchema(menus);
 
-export const orderItemsRelations = relations(
-    orderItems,
-    ({ one }) => ({
-        order: one(
-            orders,
-            {
-                fields: [orderItems.orderId],
-                references: [orders.id]
-            }
-        ),
-        product: one(
-            products,
-            {
-                fields: [orderItems.productId],
-                references: [products.id]
-            }
-        )
+export const menuItems = mysqlTable(
+    'menu_items',
+    {
+        id: serial('id').primaryKey(),
+        menuId: int('menu_id').notNull(),
+        identifier: varchar('name', { length: 256 }).notNull(),
+        href: varchar('href', { length: 256 }).notNull(),
+    },
+    (table) => ({
+        menuIdIdx: index('menu_id_idx').on(table.menuId),
     })
 )

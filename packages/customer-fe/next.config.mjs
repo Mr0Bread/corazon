@@ -1,3 +1,5 @@
+import { withAxiom } from 'next-axiom'
+
 // @ts-check
 
 /**
@@ -7,7 +9,7 @@
 !process.env.SKIP_ENV_VALIDATION && (await import("./src/env.mjs"));
 
 /** @type {import("next").NextConfig} */
-const config = {
+const config = withAxiom({
   reactStrictMode: true,
   experimental: {
     appDir: true,
@@ -20,5 +22,5 @@ const config = {
       }
     ]
   }
-};
+});
 export default config;

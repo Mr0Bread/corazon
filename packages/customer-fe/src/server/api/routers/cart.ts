@@ -6,7 +6,9 @@ import {
 import { db } from "@corazon/sale-fe/src/server/db";
 import { kv } from '@vercel/kv';
 import { products as productsTable } from "@corazon/sale-fe/src/server/schema";
-import { eq } from "drizzle-orm";
+import { eq, inArray } from "drizzle-orm";
+import { log } from 'next-axiom'
+import { measure } from "~/utils/measure";
 
 const cartSchema = z.object({
     items: z.array(
@@ -42,6 +44,30 @@ export const cartRouter = createTRPCRouter({
             const { items = [] } = cart as any;
 
             const newItems = items.filter((item: any) => item.productId !== productId);
+
+            // calculate total
+            const total = newItems.reduce((acc: number, item: any) => {
+                return acc + (item.price * item.quantity);
+            }, 0);
+
+            await kv.set(`cart-${userId}`, JSON.stringify({
+                items: newItems,
+                total
+            }));
+        }),
+    removeItems: publicProcedure
+        .input(
+            z.object({
+                productIds: z.array(
+                    z.number()
+                ),
+            })
+        )
+        .mutation(async ({ input: { productIds }, ctx: { auth: { userId } } }) => {
+            const cart = await kv.get(`cart-${userId}`) as z.infer<typeof cartSchema>;
+            const { items = [] } = cart;
+
+            const newItems = items.filter((item: any) => !productIds.includes(item.productId));
 
             // calculate total
             const total = newItems.reduce((acc: number, item: any) => {
@@ -102,7 +128,7 @@ export const cartRouter = createTRPCRouter({
 
                     return item;
                 }
-            )
+                )
 
             // calculate total
             const total = newItems.reduce((acc: number, item: any) => {
@@ -123,47 +149,106 @@ export const cartRouter = createTRPCRouter({
             })
         )
         .mutation(async ({ input: { productId, quantity }, ctx: { auth: { userId } } }) => {
-            const cart = await kv.get(`cart-${userId}`);
-            const products = await db
-                .select()
-                .from(productsTable)
-                .where(
-                    eq(productsTable.id, productId)
-                )
+            await measure(
+                async () => {
+                    const products = await db
+                        .select()
+                        .from(productsTable)
+                        .where(
+                            eq(productsTable.id, productId)
+                        )
 
-            const product = products[0];
+                    const product = products[0];
 
-            if (!product) {
-                throw new Error('Product not found');
-            }
+                    if (!product) {
+                        throw new Error('Product not found');
+                    }
 
-            const { items = [] } = cart as any;
-            const images = JSON.parse(product.images as string) as { images: string[] };
-            const image = images?.images[0] || '';
+                    const cart = await measure(() => kv.get(`cart-${userId}`), (duration) => {
+                        log.info(`KV getCart took: ${parseInt(duration.toString())}`)
+                    })
 
-            // if item exists, increment quantity
-            const item = items.find((item: any) => item.productId === productId);
+                    const { items = [] } = cart as any;
+                    const images = JSON.parse(product.images as string) as { images: string[] };
+                    const image = images?.images[0] || '';
 
-            if (item) {
-                item.quantity += quantity;
-            } else {
-                items.push({
-                    productId,
-                    quantity,
-                    name: product.name,
-                    price: product.price,
-                    image
-                });
-            }
+                    // if item exists, increment quantity
+                    const item = items.find((item: any) => item.productId === productId);
 
-            // calculate total
-            const total = items.reduce((acc: number, item: any) => {
-                return acc + (item.price * item.quantity);
-            }, 0);
+                    if (item) {
+                        item.quantity += quantity;
+                    } else {
+                        items.push({
+                            productId,
+                            quantity,
+                            name: product.name,
+                            price: product.finalPrice,
+                            image
+                        });
+                    }
 
-            await kv.set(`cart-${userId}`, JSON.stringify({
-                items,
-                total
-            }));
+                    // calculate total
+                    const total = items.reduce((acc: number, item: any) => {
+                        return acc + (item.price * item.quantity);
+                    }, 0);
+
+                    await kv.set(`cart-${userId}`, JSON.stringify({
+                        items,
+                        total
+                    }));
+                },
+                (duration) => {
+                    log.info(`KV addToCart took: ${parseInt(duration.toString())}`)
+                }
+            )
         }),
+    getMissingItems: publicProcedure
+        .output(
+            z.object({
+                missingItems: z.array(z.number())
+            })
+        )
+        .query(
+            async ({
+                ctx: {
+                    auth: {
+                        userId
+                    }
+                }
+            }) => {
+                const {
+                    items
+                } = await kv.get(`cart-${userId}`) as z.infer<typeof cartSchema>;
+
+                const itemsIds = items
+                    .map(
+                        (item) => item.productId
+                    )
+
+                const products = await db
+                    .select({
+                        id: productsTable.id
+                    })
+                    .from(productsTable)
+                    .where(
+                        inArray(
+                            productsTable.id,
+                            itemsIds
+                        )
+                    )
+
+                const missingItems = itemsIds
+                    .filter(
+                        (id) => !Boolean(
+                            products.find(
+                                (product) => product.id === id
+                            )
+                        )
+                    )
+
+                return {
+                    missingItems
+                };
+            }
+        )
 });

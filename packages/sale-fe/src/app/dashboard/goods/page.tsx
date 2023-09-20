@@ -6,6 +6,8 @@ import GoodsTable from "./table";
 import { currentUser } from "@clerk/nextjs";
 import { eq } from "drizzle-orm";
 
+export const dynamic = 'force-dynamic'
+
 export default async function Page() {
     const user = await currentUser();
 

@@ -1,11 +1,26 @@
 import { db } from '@corazon/sale-fe/src/server/db'
-import { categories as categoriesTable, productsToCategories } from '@corazon/sale-fe/src/server/schema'
-import { eq } from 'drizzle-orm'
+import {
+    categories as categoriesTable,
+    productsToCategories,
+    categoriesToChildren as categoriesToChildrenTable,
+} from '@corazon/sale-fe/src/server/schema'
+import { eq, inArray, or, sql } from 'drizzle-orm'
 import { Suspense } from 'react';
 import ProductCard from './product-card';
 import ProductCardFallback from './product-card-fallback';
+import Link from 'next/link';
 
-export default async function Page({ params }: { params: { slug: string[] } }) {
+export default async function Page({
+    params,
+    searchParams: {
+        page = '1'
+    }
+}: {
+    params: { slug: string[] },
+    searchParams: {
+        page?: string,
+    }
+}) {
     const slug = params.slug.join('/');
     const categories = await db
         .select()
@@ -26,16 +41,67 @@ export default async function Page({ params }: { params: { slug: string[] } }) {
     const category = categories[0];
 
     const linkedProducts = await db
-        .select()
+        .select({
+            productId: productsToCategories.productId
+        })
         .from(productsToCategories)
         .where(
-            eq(
-                productsToCategories.categoryId,
-                // I have condition to check that category is present
-                // but for some reason typescript still thinks that it can be undefined
-                category.id
+            or(
+                inArray(
+                    productsToCategories.categoryId,
+                    db
+                        .select({
+                            childId: categoriesToChildrenTable.childId
+                        })
+                        .from(categoriesToChildrenTable)
+                        .where(
+                            eq(categoriesToChildrenTable.parentId, category.id)
+                        )
+                ),
+                eq(
+                    productsToCategories.categoryId,
+                    category.id
+                )
             )
-        );
+        )
+        .groupBy(productsToCategories.productId)
+        .limit(20)
+        .offset((parseInt(page) - 1) * 20);
+
+    const { count } = (await db
+        .select({
+            count: sql`COUNT(*)`.mapWith(Number)
+        })
+        .from(
+            db
+                .select({
+                    productId: productsToCategories.productId
+                })
+                .from(productsToCategories)
+                .where(
+                    or(
+                        inArray(
+                            productsToCategories.categoryId,
+                            db
+                                .select({
+                                    childId: categoriesToChildrenTable.childId
+                                })
+                                .from(categoriesToChildrenTable)
+                                .where(
+                                    eq(categoriesToChildrenTable.parentId, category.id)
+                                )
+                        ),
+                        eq(
+                            productsToCategories.categoryId,
+                            category.id
+                        )
+                    )
+                )
+                .groupBy(productsToCategories.productId)
+                .as('linkedProducts')
+        ))[0] || { count: 0 };
+
+    const numberOfPages = Math.ceil(count / 20);
 
     return (
         <div
@@ -67,6 +133,26 @@ export default async function Page({ params }: { params: { slug: string[] } }) {
                     ))
                 }
             </div>
+            {
+                numberOfPages > 1 && (
+                    <div
+                        className='mt-6 flex flex-row gap-4'
+                    >
+                        {
+                            Array
+                                .from({ length: numberOfPages })
+                                .map((_, index) => (
+                                    <Link
+                                        href={`/products/${slug}?page=${index + 1}`}
+                                        className='py-2 px-3 border rounded text-foreground/90 hover:bg-accent hover:text-accent-foreground transition-colors'
+                                    >
+                                        {index + 1}
+                                    </Link>
+                                ))
+                        }
+                    </div>
+                )
+            }
         </div>
     );
 }

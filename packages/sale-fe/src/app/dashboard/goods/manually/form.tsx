@@ -28,9 +28,8 @@ import {
 } from '@/components/ui/popover'
 import { api } from "~/utils/api";
 import { useRouter } from "next/navigation";
-import { CategoriesSelectSchema } from "~/server/schema";
 import { cn } from "~/lib/utils";
-import { Check, Loader2 } from 'lucide-react';
+import { Check, Loader2, Percent } from 'lucide-react';
 import Loader from "~/components/ui/loader";
 import { generateReactHelpers } from "@uploadthing/react/hooks";
 import { OurFileRouter } from "~/app/api/uploadthing/core";
@@ -38,16 +37,28 @@ import {
     useDropzone
 } from 'react-dropzone'
 import { useCallback, useState } from "react";
+import {
+    Accordion,
+    AccordionContent,
+    AccordionItem,
+    AccordionTrigger
+} from "~/components/ui/accordion";
+import { Checkbox } from "~/components/ui/checkbox";
+import type { CategoriesSelectSchema } from "~/server/schema";
 
 const { useUploadThing } = generateReactHelpers<OurFileRouter>();
 
 const formSchema = z.object({
     name: z.string().min(1).max(120),
     description: z.string().min(1).max(520),
-    price: z.string().min(1).max(120),
+    basePrice: z.string().min(1).max(120),
     quantity: z.string().min(1).max(120),
     categories: z.array(z.string()),
-    images: z.array(z.string())
+    images: z.array(z.string()),
+    discount: z.object({
+        type: z.enum(['percentage', 'fixed']),
+        value: z.string().optional().transform(val => Number(val))
+    })
 })
 
 export default function ProductForm({
@@ -67,25 +78,31 @@ export default function ProductForm({
         resolver: zodResolver(formSchema),
         defaultValues: {
             categories: [],
-            images: []
+            images: [],
+            discount: {
+                type: 'fixed',
+                value: undefined
+            }
         }
     })
 
     const {
         startUpload
-    } = useUploadThing({
-        endpoint: "imageUploader",
-        onClientUploadComplete: (res) => {
-            console.log(res);
-
-            res?.forEach((file) => {
-                form.setValue("images", [
-                    ...form.getValues("images"),
-                    file.fileUrl
-                ])
-            })
+    } = useUploadThing(
+        "imageUploader",
+        {
+            onClientUploadComplete: (res) => {
+                console.log(res);
+    
+                res?.forEach((file) => {
+                    form.setValue("images", [
+                        ...form.getValues("images"),
+                        file.url
+                    ])
+                })
+            }
         }
-    });
+    );
 
     const onDrop = useCallback((acceptedFiles: File[]) => {
         setImages(acceptedFiles);
@@ -118,14 +135,25 @@ export default function ProductForm({
 
             console.log(data);
 
+            const {
+                discount: {
+                    value: discountValue,
+                    type: discountType
+                }
+            } = data;
+
             await createProduct({
                 data: {
                     name: data.name,
                     description: data.description,
-                    price: Number(data.price),
+                    basePrice: Number(data.basePrice),
                     quantity: Number(data.quantity),
                     categories: data.categories,
-                    images: imagesUrls
+                    images: imagesUrls,
+                    discount: discountValue ? {
+                        type: discountType,
+                        value: discountValue
+                    } : undefined
                 }
             });
 
@@ -194,7 +222,7 @@ export default function ProductForm({
                 />
                 <FormField
                     control={form.control}
-                    name="price"
+                    name="basePrice"
                     render={({ field }) => (
                         <FormItem>
                             <FormLabel
@@ -206,7 +234,7 @@ export default function ProductForm({
                                 <Input placeholder="Product price" {...field} />
                             </FormControl>
                             <FormDescription>
-                                This is the price of the product
+                                This is the base price of the product
                             </FormDescription>
                             <FormMessage />
                         </FormItem>
@@ -338,6 +366,95 @@ export default function ProductForm({
                         )
                     }
                 </div>
+                <Accordion
+                    type="single"
+                    collapsible
+                >
+                    <AccordionItem
+                        value="advanced"
+                        className="text-foreground"
+                    >
+                        <AccordionTrigger>
+                            Advanced
+                        </AccordionTrigger>
+                        <AccordionContent
+                            className="space-y-4"
+                            asChild
+                        >
+                            <FormField
+                                control={form.control}
+                                name="discount.type"
+                                render={({ field }) => (
+                                    <FormItem
+                                        className="space-y-0 flex items-start justify-start gap-3"
+                                    >
+                                        <FormControl>
+                                            <Checkbox
+                                                checked={field.value === 'percentage'}
+                                                onCheckedChange={
+                                                    (checked) => {
+                                                        field.onChange(checked ? 'percentage' : 'fixed')
+                                                    }
+                                                }
+                                                className="hidden"
+                                            />
+                                        </FormControl>
+                                        <div
+                                            role="button"
+                                            tabIndex={0}
+                                            onKeyUp={
+                                                (e) => {
+                                                    if (e.key === 'Enter' || e.key === ' ') {
+                                                        field.onChange(field.value === 'percentage' ? 'fixed' : 'percentage')
+                                                    }
+                                                }}
+                                            onClick={() => {
+                                                field.onChange(field.value === 'percentage' ? 'fixed' : 'percentage')
+                                            }}
+                                            className={cn(
+                                                "relative transition-colors w-11 h-6 bg-gray-200 rounded-full dark:bg-gray-700 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 hover:cursor-pointer",
+                                                field.value === 'percentage' ? 'after:translate-x-full after:border-white bg-blue-600 dark:bg-orange-400' : ''
+                                            )}></div>
+                                        <div>
+                                            <FormLabel
+                                                className="text-gray-200"
+                                            >
+                                                Discount as percent
+                                            </FormLabel>
+                                            <FormDescription>
+                                                If checked, amount entered below will be treated as percentage
+                                            </FormDescription>
+                                        </div>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            <FormField
+                                control={form.control}
+                                name="discount.value"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel
+                                            className="text-gray-200"
+                                        >
+                                            Discount amount
+                                        </FormLabel>
+                                        <FormControl>
+                                            <Input
+                                                type="number"
+                                                placeholder="0" {...field} 
+                                            />
+                                        </FormControl>
+                                        <FormDescription>
+                                            Amount of discount to apply to base price
+                                        </FormDescription>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                        </AccordionContent>
+                    </AccordionItem>
+                </Accordion>
                 <Button
                     type="submit"
                     disabled={isSubmitting}

@@ -80,10 +80,12 @@ export default function CheckoutForm({
 
     if (!isLoaded) {
         return (
-            <div>
+            <div
+                className="flex items-center justify-center"
+            >
                 <Loader2
-                    size={22}
-                    className="animate-spin"
+                    size={32}
+                    className="text-foreground animate-spin"
                 />
             </div>
         );
@@ -160,7 +162,7 @@ export default function CheckoutForm({
                     <FormLabel
                         className="text-gray-200 text-md"
                     >
-                        Select parcel machine
+                        Parcel machine
                     </FormLabel>
                     <div
                         className="flex justify-center items-center mt-6"
@@ -184,7 +186,7 @@ export default function CheckoutForm({
                         <FormLabel
                             className="text-gray-200 text-md"
                         >
-                            Select parcel machine
+                            Parcel machine
                         </FormLabel>
                         <FormControl>
                             <Popover
@@ -242,7 +244,7 @@ export default function CheckoutForm({
                             </Popover>
                         </FormControl>
                         <FormDescription>
-                            This is the parcel machine were your order will be delivered to
+                            This is the parcel machine where your order will be delivered to
                         </FormDescription>
                         <FormMessage />
                     </FormItem>

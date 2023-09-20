@@ -2,13 +2,18 @@
   "name": "corazon",
   "version": "0.0.0",
   "license": "MIT",
-  "scripts": {},
+  "scripts": {
+    "dev": "turbo dev",
+    "db:push": "drizzle-kit push:mysql --config packages/sale-fe/drizzle.config.ts"
+  },
   "private": true,
   "workspaces": [
     "packages/*",
     "apps/*"
   ],
   "devDependencies": {
-    "turbo": "^1.10.0"
+    "drizzle-kit": "0.18.1",
+    "turbo": "^1.10.0",
+    "typescript": "^5.1.6"
   }
 }

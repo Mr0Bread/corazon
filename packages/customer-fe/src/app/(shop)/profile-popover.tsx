@@ -20,7 +20,7 @@ const ProfilePopover = () => {
                 <PopoverTrigger asChild>
                     <Button
                         variant="outline"
-                        className="text-foreground/80"
+                        className="text-foreground/80 bg-background"
                     >
                         <User />
                     </Button>

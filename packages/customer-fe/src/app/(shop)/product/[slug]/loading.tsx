@@ -3,7 +3,7 @@ import { Skeleton } from "~/components/ui/skeleton"
 export default function Loading() {
     return (
         <div
-            className="max-w-7xl px-10 mt-8"
+            className="max-w-7xl px-10"
         >
             <Skeleton
                 className="h-[45px] w-full"

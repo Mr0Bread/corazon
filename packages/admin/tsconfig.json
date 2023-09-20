@@ -27,6 +27,9 @@
       ],
       "@/*": [
         "./src/*"
+      ],
+      "@corazon/sale-fe/*": [
+        "../sale-fe/*"
       ]
     },
     "plugins": [
