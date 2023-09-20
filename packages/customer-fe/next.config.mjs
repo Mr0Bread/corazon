@@ -11,9 +11,6 @@ import { withAxiom } from 'next-axiom'
 /** @type {import("next").NextConfig} */
 const config = withAxiom({
   reactStrictMode: true,
-  experimental: {
-    appDir: true,
-  },
   images: {
     remotePatterns: [
       {
